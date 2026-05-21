@@ -1,0 +1,413 @@
+name: Test and Deploy
+on:
+  push:
+   branches: [main]
+  pull_request:
+   branches: [main]
+jobs:
+  lint:
+   runs-on: ubuntu-latest
+   steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+     uses: actions/setup-python@v5
+     with:
+      python-version: '3.11'
+
+
+
+      cache: 'pip'
+
+    - name: Install dependencies
+     run: pip install -r requirements.txt
+    - name: Run linting
+     run: |
+      pip install flake8
+      flake8 bot/ --max-line-length=100 --ignore=E501,W503
+  deploy:
+   needs: lint
+   runs-on: ubuntu-latest
+   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+   steps:
+    - name: Trigger Render Deploy
+     run: |
+      curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}" \
+      -H "Content-Type: application/json"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+21. Betting Math  Explained
+
+
+Core Formula
+
+
+Every bet is head-to-head (2 players):
+
+pool = entry_amount x 2
+commission = pool x (commission_pct / 100)
+winner_payout = pool - commission
+loser_payout = 0
+
+Default commission: 16.67% (admin-configurable)
+
+Tier Breakdown
+
+
+Default Bet Tiers
+Entry Pool  Commission(16.67%) Winner Gets Your Profit
+------ ------ ------------------ ----------- -----------
+Rs.3  Rs.6  Rs.1        Rs.5    Rs.2
+Rs.5  Rs.10 Rs.1.67     Rs.9    Rs.4
+Rs.10 Rs.20 Rs.3.33     Rs.18   Rs.8
+Rs.25 Rs.50 Rs.8.33     Rs.45   Rs.20
+Rs.50 Rs.100 Rs.16.67   Rs.90   Rs.40
+Rs.100 Rs.200 Rs.33.33  Rs.180  Rs.80
+Rs.500 Rs.1000 Rs.166.67 Rs.900 Rs.400
+Rs.1000 Rs.2000 Rs.333.33 Rs.1800 Rs.800
+ALL values admin-configurable via /admin -> Bot Settings
+Revenue Projection
+
+1000 bets/day at avg Rs.10 entry:
+Commission: Rs.3,334/day = Rs.1,00,020/month
+
+10,000 bets/day at avg Rs.25:
+Commission: Rs.83,350/day = Rs.25,00,500/month
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+22. Psychology   Features  (20+)
+
+
+1. Welcome Bonus (Rs.10) -- RECIPROCITY
+
+Free credits on /start. User feels obligated to reciprocate.
+
+2. Social Proof Counter -- SOCIAL PROOF
+'Join 47,823+ players' shows real user count (floor 1000).
+
+3. Win Rate Progress Bar -- COMMITMENT
+
+Visual [######....] bar. Users feel compelled to improve it.
+
+4. Loss Aversion Messages -- LOSS AVERSION
+'Don't lose your streak!' Losses hurt 2x more than gains.
+
+5. Lucky Spin Wheel -- VARIABLE REWARD
+
+Random Rs.1-500 prizes. Unpredictable rewards = strongest habits.
+
+6. Daily Streak Bonuses -- HABIT LOOP
+Login daily = +10%/day bonus. Creates daily ritual.
+
+7. Quick Bet Buttons -- FRICTION REMOVAL
+
+One-tap Rs.3 bet. 5 steps -> 1 step = higher conversion.
+
+8. Win Celebration -- DOPAMINE
+'YOU WON!!!' + 'Bet Again' while dopamine is high.
+
+9. Loss Recovery Prompts -- SUNK COST
+
+After loss: 'Spin for free boost!' Redirects from pain.
+
+10. Referral Rewards -- UNITY
+'Invite & earn Rs.5'. Friends stay longer together.
+
+11. Leaderboard -- COMPETITION
+
+Top 10 with medals. Public recognition = retention.
+
+12. Countdown Urgency -- SCARCITY
+'Bets lock in 5 min!' Time pressure = faster decisions.
+
+13. Opponent Alert -- FOMO + COMMITMENT
+
+'GAME ON!' locks commitment. Can't cancel once matched.
+
+14. Tiered Amounts -- DECOY PRICING
+8 tiers: middle tiers look best vs low and high extremes.
+
+15. Balance Display -- ENDOWMENT
+
+'Your Rs.XX' on every screen. Users value what they own.
+
+
+
+
+
+
+16. Personalization -- LIKING
+
+'Hey {name}!' increases trust and engagement.
+
+17. Re-engagement -- TRIGGER
+
+24h/72h/7d graduated urgency notifications.
+18. Weekly Leaderboard -- AUTHORITY
+
+Organized announcements show structure and proof.
+
+19. Bet Again After Win -- HOT HAND
+
+'While you're hot!' exploits streak belief.
+20. Live Match Badge -- URGENCY
+
+'3 matches live!' creates FOMO.
+
+21. Auto-Refund -- TRUST
+Expired rooms refunded automatically. Builds confidence.
+
+22. Flash Events -- SURPRISE
+
+Admin-triggered bonus events = unpredictable engagement.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+23. Security Architecture
+
+
+Atomic Wallet Operations
+
+PostgreSQL row-level locks via FOR UPDATE in debit_balance() RPC. Prevents race conditions where two
+simultaneous debits could overdraw a wallet.
+
+Anti-Fraud Engine
+
+Detects: rapid betting (>10/min), self-matching, high-value bets from new accounts, daily bet caps (100/day).
+Rate Limiting
+
+Sliding window: 20 msgs/60s default, 3x for premium. Shows wait time when exceeded.
+
+Webhook Secret
+
+Random token in env var. Verified on every webhook request. Prevents fake updates.
+Row Level Security
+
+All tables have RLS. Only service_role key can access. Anon key = zero access.
+
+Input Validation
+
+All callback data split and validated. Unknown prefixes rejected. IDs verified against DB.
+SQL Injection Prevention
+
+Zero raw SQL. All queries via Supabase client parameterized methods.
+
+Admin Authentication
+User ID checked against ADMIN_IDS whitelist. Non-admins get alert.
+
+Bet Lock Timing
+
+Auto-lock before match start. Prevents betting on known outcomes.
+
+New Account Limits
+<1 hour old accounts: max Rs.100 bets. Prevents rapid fraud.
+
+Optimistic Locking
+
+join_room uses .eq('status','open') in UPDATE. Only one joiner succeeds.
+
+Error Isolation
+Every handler in try/except. Errors logged, admin notified, user sees friendly msg.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+24. Testing Checklist
+
+
+User Flow Tests
+
+
+-  /start as new user -> welcome + Rs.10 bonus + main menu
+-  /start as returning user -> welcome back + stats
+-  /start with referral -> both users get bonuses
+
+-  /matches -> shows live matches from CricAPI
+-  Select match -> bet flow works end to end
+-  Quick Bet button -> one-tap bet placement
+-  Lucky Spin -> prize credited, 24h cooldown works
+
+-  /wallet -> balance and transaction history
+-  /admin -> dashboard loads (admin only)
+-  Admin broadcast -> sends to all users
+
+-  Admin config edit -> saves to DB
+-  Withdrawal flow -> amount + UPI + request created
+
+Edge Case Tests
+
+-  User with no username -> handled throughout
+-  Double-click on bet button -> only one bet placed
+
+-  User tries to join own room -> rejected
+-  User with Rs.0 tries to bet -> insufficient balance
+-  Match abandoned -> all rooms refunded
+-  Rate limit exceeded -> shows wait time
+
+-  Banned user -> blocked with message
+-  Non-admin tries /admin -> rejected
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                         Setup    Complete!
+
+
+
+
+                              Quick Reference:
+
+1.    Run SQL migration in Supabase
+
+2.    Push code to GitHub
+3.    Create Render web service
+
+4.    Set all environment variables
+
+5.    Deploy and verify with /start
+6.    Set up UptimeRobot monitor

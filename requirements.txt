@@ -1,0 +1,8 @@
+# Core
+python-telegram-bot[webhooks,job-queue]==21.11.1
+# Database
+supabase==2.13.0
+# HTTP client for Cricket API
+httpx==0.28.1
+# Environment
+python-dotenv==1.1.0
