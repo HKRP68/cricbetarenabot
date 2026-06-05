@@ -330,21 +330,31 @@ ALTER TABLE spins ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bet_tiers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE platform_config ENABLE ROW LEVEL SECURITY;
 -- Service role gets full access (bot backend uses service_role key)
-CREATE POLICY IF NOT EXISTS srv_users ON users FOR ALL TO service_role
+-- PostgreSQL does not support an IF NOT EXISTS clause for policies, so
+-- policy creation is idempotent by dropping existing policies first.
+DROP POLICY IF EXISTS srv_users ON users;
+CREATE POLICY srv_users ON users FOR ALL TO service_role
    USING (TRUE) WITH CHECK (TRUE);
-CREATE POLICY IF NOT EXISTS srv_matches ON matches FOR ALL TO service_role
+DROP POLICY IF EXISTS srv_matches ON matches;
+CREATE POLICY srv_matches ON matches FOR ALL TO service_role
    USING (TRUE) WITH CHECK (TRUE);
-CREATE POLICY IF NOT EXISTS srv_rooms ON rooms FOR ALL TO service_role
+DROP POLICY IF EXISTS srv_rooms ON rooms;
+CREATE POLICY srv_rooms ON rooms FOR ALL TO service_role
    USING (TRUE) WITH CHECK (TRUE);
-CREATE POLICY IF NOT EXISTS srv_txn ON transactions FOR ALL TO service_role
+DROP POLICY IF EXISTS srv_txn ON transactions;
+CREATE POLICY srv_txn ON transactions FOR ALL TO service_role
    USING (TRUE) WITH CHECK (TRUE);
-CREATE POLICY IF NOT EXISTS srv_wd ON withdrawals FOR ALL TO service_role
+DROP POLICY IF EXISTS srv_wd ON withdrawals;
+CREATE POLICY srv_wd ON withdrawals FOR ALL TO service_role
    USING (TRUE) WITH CHECK (TRUE);
-CREATE POLICY IF NOT EXISTS srv_spins ON spins FOR ALL TO service_role
+DROP POLICY IF EXISTS srv_spins ON spins;
+CREATE POLICY srv_spins ON spins FOR ALL TO service_role
    USING (TRUE) WITH CHECK (TRUE);
-CREATE POLICY IF NOT EXISTS srv_tiers ON bet_tiers FOR ALL TO service_role
+DROP POLICY IF EXISTS srv_tiers ON bet_tiers;
+CREATE POLICY srv_tiers ON bet_tiers FOR ALL TO service_role
    USING (TRUE) WITH CHECK (TRUE);
-CREATE POLICY IF NOT EXISTS srv_config ON platform_config FOR ALL TO service_role
+DROP POLICY IF EXISTS srv_config ON platform_config;
+CREATE POLICY srv_config ON platform_config FOR ALL TO service_role
    USING (TRUE) WITH CHECK (TRUE);
 -- =======================================
 -- 12. DAILY RESET FUNCTION
