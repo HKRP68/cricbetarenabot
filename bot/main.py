@@ -2,6 +2,7 @@
 Main Entry Point -- Application bootstrap, handler registration,
 webhook/polling setup, and graceful shutdown.
 """
+import asyncio
 import logging
 import sys
 from datetime import time, timezone, timedelta
@@ -33,6 +34,20 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
+
+def ensure_event_loop() -> None:
+   """Ensure a current event loop exists for sync PTB runners.
+
+   Python 3.14 no longer creates a default event loop for the main thread
+   when ``asyncio.get_event_loop()`` is called. python-telegram-bot 21.x
+   still relies on that current-loop lookup inside ``run_webhook`` and
+   ``run_polling``, so create and register one before handing control to PTB.
+   """
+   try:
+     asyncio.get_event_loop()
+   except RuntimeError:
+     asyncio.set_event_loop(asyncio.new_event_loop())
+
 async def post_init(application: Application) -> None:
    """Initialize services after application starts."""
    logger.info("Initializing services...")
@@ -239,6 +254,7 @@ def build_application() -> Application:
    return app
 def main() -> None:
    """Entry point. Runs webhook in production, polling in development."""
+   ensure_event_loop()
    app = build_application()
    if config.WEBHOOK_URL:
      # --- WEBHOOK MODE (Production/Render) ---
