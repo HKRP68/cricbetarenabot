@@ -8,6 +8,7 @@ import sys
 import logging
 from dataclasses import dataclass, field
 from typing import List, Optional
+from urllib.parse import urlparse
 logger = logging.getLogger(__name__)
 @dataclass(frozen=True)
 class Config:
@@ -57,6 +58,24 @@ class Config:
 
    # --- Logging ---
    LOG_LEVEL: str = "INFO"
+
+   @property
+   def normalized_webhook_path(self) -> str:
+     """Return the webhook path without a leading slash for PTB routing."""
+     return self.WEBHOOK_PATH.strip("/")
+
+   @property
+   def normalized_webhook_url(self) -> str:
+     """Return a Telegram-compatible HTTPS webhook URL."""
+     if not self.WEBHOOK_URL:
+       return ""
+
+     base_url = self.WEBHOOK_URL.strip().rstrip("/")
+     if not urlparse(base_url).scheme:
+       base_url = f"https://{base_url}"
+
+     return f"{base_url}/{self.normalized_webhook_path}"
+
    def validate(self) -> bool:
      """Validate all required config values exist."""
      errors = []
@@ -70,6 +89,8 @@ class Config:
        errors.append("CRICKET_API_KEY is required")
      if not self.ADMIN_IDS:
        errors.append("ADMIN_IDS is required (comma-separated)")
+     if self.WEBHOOK_URL and not self.normalized_webhook_path:
+       errors.append("WEBHOOK_PATH must contain at least one non-slash character")
      if errors:
        for e in errors:
           logger.critical("CONFIG ERROR: %s", e)

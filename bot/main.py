@@ -258,19 +258,17 @@ def main() -> None:
    app = build_application()
    if config.WEBHOOK_URL:
      # --- WEBHOOK MODE (Production/Render) ---
+     webhook_url = config.normalized_webhook_url
+     webhook_path = config.normalized_webhook_path
      logger.info(
-
-
-
        "Starting webhook on port %d at %s",
-       config.PORT, config.WEBHOOK_URL,
+       config.PORT, webhook_url,
      )
-     webhook_url = f"{config.WEBHOOK_URL}{config.WEBHOOK_PATH}"
 
      app.run_webhook(
        listen="0.0.0.0",
        port=config.PORT,
-       url_path=config.WEBHOOK_PATH,
+       url_path=webhook_path,
        webhook_url=webhook_url,
        secret_token=config.WEBHOOK_SECRET or None,
        allowed_updates=Update.ALL_TYPES,
