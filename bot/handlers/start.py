@@ -301,11 +301,11 @@ async def stats_command(
        f"|- Total Bets: <b>{stats.get('total_bets', 0)}</b>\n"
        f"|- Wins: <b>{stats.get('wins', 0)}</b> [OK]\n"
        f"|- Losses: <b>{stats.get('losses', 0)}</b> [X]\n"
-       f"\- Win Rate: <b>{win_rate}%</b> [{bar}]\n\n"
+       f"|- Win Rate: <b>{win_rate}%</b> [{bar}]\n\n"
        f"? <b>Financial:</b>\n"
        f"|- Balance: <b>?{stats.get('balance', 0):,}</b>\n"
        f"|- Total Won: <b>?{stats.get('total_winnings', 0):,}</b>\n"
-       f"\- Streak: <b>{stats.get('streak_days', 0)} days</b> ?\n\n"
+       f"|- Streak: <b>{stats.get('streak_days', 0)} days</b> ?\n\n"
        f"? <i>Keep playing to improve your stats!</i>"
      )
      from bot.keyboards.betting import build_post_result_keyboard
